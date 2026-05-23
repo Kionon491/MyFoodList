@@ -1,8 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { Home, List, Search, Star, Plus, X, Utensils, Activity, Settings, Moon, Sun, Image as ImageIcon, StarHalf } from 'lucide-react';
 
-// --- MOCK DATA ---
-const INITIAL_FOODS = [
+interface Food {
+  id: number;
+  name: string;
+  emoji: string;
+  imageUrl: string;
+  category: string;
+  estPrice: number;
+  desc: string;
+}
+
+interface FoodEntry {
+  foodId: number;
+  status: 'want_to_eat' | 'eaten';
+  rating: number;
+  addedAt: number;
+}
+
+const INITIAL_FOODS: Food[] = [
   { id: 1, name: 'Swiss Cheese Fondue', emoji: '🧀', imageUrl: '', category: 'Swiss', estPrice: 28, desc: 'A rich blend of Gruyère and Vacherin, served with bread cubes.' },
   { id: 2, name: 'Shoyu Ramen', emoji: '🍜', imageUrl: '', category: 'Japanese', estPrice: 18, desc: 'Soy sauce based broth with curly noodles, chashu, and a soft boiled egg.' },
   { id: 3, name: 'Pizza Margherita', emoji: '🍕', imageUrl: '', category: 'Italian', estPrice: 15, desc: 'Classic Neapolitan pizza with San Marzano tomatoes, mozzarella, and basil.' },
@@ -20,9 +36,12 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('home');
   const [searchQuery, setSearchQuery] = useState('');
   
-  // Data State
-  const [foodDatabase, setFoodDatabase] = useState(INITIAL_FOODS);
-  const [myList, setMyList] = useState([]); // { foodId, status, rating, addedAt }
+// Replace your existing state lines with these:
+const [foodDatabase, setFoodDatabase] = useState<Food[]>(INITIAL_FOODS);
+const [myList, setMyList] = useState<FoodEntry[]>(() => {
+  const saved = localStorage.getItem('myFoodList');
+  return saved ? JSON.parse(saved) : [];
+});
   
   // Modal States
   const [selectedFood, setSelectedFood] = useState(null);
@@ -76,7 +95,7 @@ export default function App() {
   };
 
   // --- SUB-COMPONENTS ---
-  const TopBar = ({ title }) => (
+  const TopBar = ({ title }: { title: string }) => (
     <div 
       className="text-white p-4 text-center font-bold text-lg shadow-md sticky top-0 z-10 flex justify-between items-center transition-colors"
       style={{ backgroundColor: activeColor }}
@@ -158,7 +177,7 @@ export default function App() {
     );
   };
 
-  const FoodCard = ({ food }) => {
+  const FoodCard = ({ food }: { food: Food }) => {
     const listEntry = myList.find(item => item.foodId === food.id);
     
     return (
